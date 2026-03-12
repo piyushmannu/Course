@@ -51,3 +51,12 @@ class LessonProgressAdmin(admin.ModelAdmin):
     def get_course(Self,obj):
         return obj.lesson.course
     get_course.short_description = 'Course'
+
+@admin.register(review)
+class reviewAdmin(admin.ModelAdmin):
+    list_display = ('student','course','created_at')
+    list_filter = ('rating',)
+    search_fields = ('student__username',)
+
+admin.site.register(Coupon)
+# admin.site.register(process_payment)

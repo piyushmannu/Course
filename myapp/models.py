@@ -5,6 +5,8 @@ from django.contrib.auth.models import AbstractUser
 import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db import transaction
+
 
 # Create your models here.
 class User(AbstractUser):
@@ -99,6 +101,13 @@ class Enrollment(models.Model):
     class Meta :
         unique_together = ('students','course')
 
+class Coupon(models.Model):
+    code = models.CharField(max_length=20,unique=True)
+    discount_percent = models.IntegerField()
+    valid_from = models.DateField()
+    valid_to = models.DateTimeField()
+    active = models.BooleanField(default=True)
+
 class Payment(models.Model):
     STATUS_CHOICES = (
         ('pending','Pending'),
@@ -110,7 +119,8 @@ class Payment(models.Model):
     transaction_id = models.UUIDField(default=uuid.uuid4,editable=False,unique=True,db_index=True)
     student = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     course = models.ForeignKey(Course,on_delete=models.CASCADE)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price at time of purchase")    
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price at time of purchase")  
+    coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True,blank=True)  
     status = models.CharField(max_length=10,choices=STATUS_CHOICES,default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -119,6 +129,11 @@ class Payment(models.Model):
         if not self.amount_paid:
             self.amount_paid = self.course.price
         super().save(*args, **kwargs)
+
+    @transaction.atomic
+    def process_payment(student,course):
+        payment = Payment.objects.create(
+            student = student, course = course, amount_paid = course.price, status = "completed")
 
     def __str__(self):
         return f"{self.student.username} - {self.course.title} ({self.status})"
@@ -140,4 +155,14 @@ def create_enrollment_on_payment(sender,instance,created,**kwargs):
             students=instance.student,
             course=instance.course
         )
+
+class review(models.Model):
+    student = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    course = models.ForeignKey(Course,on_delete=models.CASCADE,related_name='reviews')
+    rating = models.IntegerField()
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student','course')
 
