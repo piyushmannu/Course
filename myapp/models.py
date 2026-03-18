@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.text import slugify
 
 # Create your models here.
 class User(AbstractUser):
@@ -14,12 +15,12 @@ class User(AbstractUser):
     )
     role = models.CharField(max_length=10,choices=ROLE_CHOICES)
     bio = models.TextField(blank=True)
-    avatar = models.ImageField(upload_to='avtars/',null = True, blank = True)
+    avatar = models.ImageField(upload_to='avatars/',null = True, blank = True)
     phone_no = models.CharField(max_length=15,blank = True)
     dob = models.DateField(null=True,blank= True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
-    is_verified = models.BooleanField(db_default=False)
+    # created_at = models.DateTimeField(auto_now_add=True, null=True)
+    # updated_at = models.DateTimeField(auto_now=True, null=True)
+    is_verified = models.BooleanField(default=False)
 
     def is_student(self):
         return self.role == 'student'
@@ -32,8 +33,22 @@ class Category(models.Model):
     slug = models.SlugField(max_length=50,unique=True)
     description = models.TextField(blank=True)
 
-    class Meta : 
-        verbose_name_plural = "Categories"
+    parent = models.ForeignKey("self",on_delete = models.CASCADE,null=True,blank=True,related_name="subcategories")
+
+    created_by = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True,related_name='categories')
+    created_at = models.DateField(auto_now_add = True)
+
+    # class Meta : 
+    #     verbose_name_plural = "Categories"
+    #     unique_together = ['name','parent']
+
+    # def save(self,*args,**kwargs):
+    #     if not self.slug:
+    #         if self.parent:
+    #             self.slug = slugify(f'(self.parent.slug)-(self.name)')
+    #         else :
+    #             self.slug = slugify(self.name)
+    #         super().save(*args,**kwargs)
 
     def __str__(self):
         return self.name
