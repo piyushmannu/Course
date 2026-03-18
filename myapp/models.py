@@ -14,9 +14,12 @@ class User(AbstractUser):
     )
     role = models.CharField(max_length=10,choices=ROLE_CHOICES)
     bio = models.TextField(blank=True)
-    avtar = models.ImageField(upload_to='avtars/',null = True, blank = True)
-    phone_no = models.CharField(max_length=11,blank = True)
+    avatar = models.ImageField(upload_to='avtars/',null = True, blank = True)
+    phone_no = models.CharField(max_length=15,blank = True)
     dob = models.DateField(null=True,blank= True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(db_default=False)
 
     def is_student(self):
         return self.role == 'student'
@@ -140,4 +143,4 @@ def create_enrollment_on_payment(sender,instance,created,**kwargs):
             students=instance.student,
             course=instance.course
         )
-
+ 
