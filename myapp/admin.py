@@ -7,7 +7,7 @@ class CustomUserAdmin(UserAdmin):
     model = User
     fieldsets = UserAdmin.fieldsets + (
         ("Additional Information", {
-        'fields' : ('bio','avtar','phone_no','dob','role')
+        'fields' : ('bio','avatar','phone_no','dob','role')
     }),
 )
     
@@ -51,3 +51,5 @@ class LessonProgressAdmin(admin.ModelAdmin):
     def get_course(Self,obj):
         return obj.lesson.course
     get_course.short_description = 'Course'
+
+admin.site.register(Coupon)

@@ -2,6 +2,7 @@
 
 import django.db.models.deletion
 from django.conf import settings
+import django.utils.timezone
 from django.db import migrations, models
 
 
@@ -15,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='category',
             name='created_at',
-            field=models.DateField(auto_now_add=True, default=True),
+            field=models.DateField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(
