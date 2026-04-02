@@ -52,4 +52,8 @@ class LessonProgressAdmin(admin.ModelAdmin):
         return obj.lesson.course
     get_course.short_description = 'Course'
 
-admin.site.register(Coupon)
+@admin.register(Coupon)
+class CouponProgressAdmin(admin.ModelAdmin):
+    list_display = ('code','discount_percent','active')
+    list_filter = ('active','valid_to')
+    search_fields = ('code',)
