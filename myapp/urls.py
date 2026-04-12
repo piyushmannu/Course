@@ -4,4 +4,5 @@ from .views import *
 
 urlpatterns = [
     path('category/',enter_category),
+    path('hello/',Helloview),
 ]

@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 import uuid
+from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
@@ -47,7 +48,7 @@ class Course(models.Model):
     title = models.CharField(max_length=50)
     thumbnail = models.ImageField(upload_to='thumbnails/%Y/%m/',blank=True,null=True)
     price = models.DecimalField(max_digits=10,decimal_places=2,default=0.00)
-    teacher = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    teacher = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name = 'courses')
 
     @property
     def total_duration(self):
@@ -61,8 +62,6 @@ class Course(models.Model):
         if hour > 0:
             return f"{hour}h {minutes}m"
         return f"{minutes}m" 
-
-    teacher = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='course')
     
     def __str__(self):
         return self.title
@@ -136,7 +135,7 @@ class Payment(models.Model):
         super().save(*args, **kwargs)
 
     @transaction.atomic
-    def process_payment(student,course):
+    def process_payment(self,student,course):
         payment = Payment.objects.create(
             student = student, course = course, amount_paid = course.price, status = "completed")
 
