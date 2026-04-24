@@ -1,11 +1,11 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenRefreshView
 from .views import *
 
 urlpatterns = [
-    path('category/',enter_category),
-    path('hello/',Helloview.as_view()),
-    path('auth/register/', register),
-    path('auth/refresh/',  TokenRefreshView.as_view()),  # simplejwt handles this
-
+    # List all categories & create new
+    path('category/', enter_category, name='category-list-create'),
+    path('course/', enter_course),
+    
+    # Get single category, update, delete
+    # path('category/<int:category_id>/', get_category_detail, name='category-detail'),
 ]
