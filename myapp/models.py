@@ -109,7 +109,7 @@ class Coupon(models.Model):
     code = models.CharField(max_length=20,unique=True)
     discount_percent = models.IntegerField()
     valid_from = models.DateField()
-    valid_to = models.DateTimeField()
+    valid_to = models.DateField()
     active = models.BooleanField(default=True)
 
 class Payment(models.Model):

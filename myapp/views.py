@@ -82,3 +82,53 @@ def enter_course(request):
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
+def enter_lesson(request):
+    if request.method == "POST":
+        serializer = lessonserializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status = status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
+def enrollment_status(request):
+    if request.method == "POST":
+        serializer = enrollserializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status = status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
+def coupon_status(request):
+    if request.method == "POST":
+        serializer = couponserializers(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status = status.HTTP_201_CREATED)
+        return Response(serializer.errors,status = status.HTTP_BAD_REQUEST)
+
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
+def payment_status(request):
+    if request.method == "POST":
+        serializer = paymentserializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status = status.HTTP_201_CREATED)
+        return Response(serializer.errors,status = status.HTTP_BAD_REQUEST)
+
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
+def review_posting(request):
+    if request.method == "POST":
+        serializer = reviewserializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status = status.HTTP_201_CREATED)
+        return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
