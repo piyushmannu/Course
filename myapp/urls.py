@@ -10,6 +10,8 @@ urlpatterns = [
     path('coupon/',coupon_status),
     path('payment/',payment_status),
     path('review/',review_posting),
+    path('register/', register_user),
+    
 
     
     # Get single category, update, delete

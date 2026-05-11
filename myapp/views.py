@@ -7,10 +7,48 @@ from rest_framework import status
 from .serializers import *
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model,authenticate
+from .permission import IsTeacher, IsStudent, IsTeacherOrReadOnly, IsEnrolledStudent, IsOwnerOrReadOnly
 
 User = get_user_model()
 # Create your views here.
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_user(request):
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+
+        #Auto generate the JWT tokens after register
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            "message" : f"{user.role.capitalize()} account created successfully",
+            "username": user.username,
+            "role" : user.role,
+            "access_token" : str(refresh.access_token()),
+            "refresh_token" : str(refresh),
+        }, status = status.HTTP_201_CREATED)
+    return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+# @api_view(['GET','POST'])
+# @permission_classes([IsTeacherOrReadOnly])
+# def enter_category(request):
+
+#     #get read all the categories from DB
+#     if request.method == "GET":
+#         categories = Category.objects.all()
+#         serializer = categorySerializer(categories, many = True)
+#         return Response(serializer.data, status = status.HTTP_200_OK)
+
+#     #to enter a new data
+#     if request.method == "POST":
+#         serializer = categorySerializer(data = request.data)
+#         if serializer.is_valid():
+#             serializer.save(created_by = request.user)
+#             return Response(serializer.data, status = status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)        
+
 @api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
 def enter_category(request):
@@ -21,58 +59,6 @@ def enter_category(request):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-# @api_view(['POST'])
-# @permission_classes([AllowAny])
-# def register(request):
-#     data = request.data
-
-#     required = ['username', 'email', 'password', 'role']
-    
-#     # Bug 1 fixed: single loop, not nested
-#     for field in required:
-#         if field not in data:
-#             return Response(
-#                 {'error': f'{field} is required'},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-
-#     # Bug 2 fixed: all checks are OUTSIDE the for loop
-#     if data['role'] not in ['student', 'teacher']:
-#         return Response(
-#             {'error': 'Role must be either student or teacher'},
-#             status=status.HTTP_400_BAD_REQUEST
-#         )
-
-#     if User.objects.filter(email=data['email']).exists():
-#         return Response(
-#             {'error': 'Email already exists'},  # Bug 5 fixed: dict not set
-#             status=status.HTTP_400_BAD_REQUEST
-#         )
-
-#     if User.objects.filter(username=data['username']).exists():
-#         return Response(
-#             {'error': 'Username already exists'},  # Bug 5 fixed
-#             status=status.HTTP_400_BAD_REQUEST
-#         )
-
-#     user = User.objects.create_user(
-#         username=data['username'],
-#         email=data['email'],
-#         password=data['password'],
-#         role=data['role']
-#     )
-
-#     refresh = RefreshToken.for_user(user)  # Bug 3 fixed: user not User
-
-#     return Response({
-#         'message': f'{user.role} account created successfully',
-#         'username': user.username,   # Bug 4 fixed: variable not string
-#         'email': user.email,         # Bug 4 fixed
-#         'role': user.role,           # Bug 4 fixed
-#         'access': str(refresh.access_token),
-#         'refresh': str(refresh)
-#     }, status=status.HTTP_201_CREATED)
-
 @api_view(['GET','POST'])
 @permission_classes([IsAuthenticated])
 def enter_course(request):

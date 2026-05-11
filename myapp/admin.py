@@ -57,3 +57,9 @@ class CouponProgressAdmin(admin.ModelAdmin):
     list_display = ('code','discount_percent','active')
     list_filter = ('active','valid_to')
     search_fields = ('code',)
+
+@admin.register(review)
+class reviewAdmin(admin.ModelAdmin):
+    list_display = ('student','course','rating')
+    list_filter = ('course','created_at')
+    search_fields = ('course',)
