@@ -48,7 +48,7 @@ class Course(models.Model):
     title = models.CharField(max_length=50)
     thumbnail = models.ImageField(upload_to='thumbnails/%Y/%m/',blank=True,null=True)
     price = models.DecimalField(max_digits=10,decimal_places=2,default=0.00)
-    teacher = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name = 'courses')
+    teacher = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name = 'course')
 
     @property
     def total_duration(self):
@@ -121,7 +121,7 @@ class Payment(models.Model):
 
     #Generate a unique transaction ID for each attempt
     transaction_id = models.UUIDField(default=uuid.uuid4,editable=False,unique=True,db_index=True)
-    student = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    student = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, related_name='payments')
     course = models.ForeignKey(Course,on_delete=models.CASCADE)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price at time of purchase")  
     coupon = models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True,blank=True)  
